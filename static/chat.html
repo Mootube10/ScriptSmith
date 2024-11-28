@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        #messages { max-height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f9f9f9; }
+        input { padding: 10px; width: 75%; margin-right: 10px; }
+        button { padding: 10px; }
+        .message { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Chat System</h1>
+    <div id="messages"></div>
+    <input type="text" id="message-input" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        // Connect to WebSocket server
+        const socket = new WebSocket('ws://localhost:8765');
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('message-input');
+
+        // When WebSocket connection is established
+        socket.onopen = function() {
+            console.log("Connected to WebSocket server");
+        };
+
+        // When a new message is received
+        socket.onmessage = function(event) {
+            const message = event.data;
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.textContent = message;
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;  // Scroll to the bottom
+        };
+
+        // Send a message to the server
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.send(message);
+                messageInput.value = ''; // Clear input
+            }
+        }
+    </script>
+</body>
+</html>
